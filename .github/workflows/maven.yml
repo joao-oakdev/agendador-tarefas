@@ -10,6 +10,8 @@ permissions:
   contents: write
   security-events: write
   actions: read
+  checks: write
+  pull-requests: write
 
 jobs:
   build:
@@ -32,17 +34,25 @@ jobs:
     - name: Executar testes
       run: mvn test
 
-    - name: Executar testes de cobertura
+    - name: Executar testes de cobertura (se disponível)
+      continue-on-error: true
       run: mvn jacoco:report
 
-    - name: Gerar relatório de testes
-      if: always()
+    - name: Publicar relatório de testes
+      if: always() && github.event_name != 'pull_request'
       uses: dorny/test-reporter@v1
       with:
         name: Maven Tests
         path: target/surefire-reports/*.xml
         reporter: java-junit
         fail-on-error: false
+    
+    - name: Publicar resultados de testes (PR)
+      if: always() && github.event_name == 'pull_request'
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      with:
+        files: target/surefire-reports/*.xml
+        check_name: Maven Test Results
 
     - name: Submeter snapshot de dependências
       uses: advanced-security/maven-dependency-submission-action@v4

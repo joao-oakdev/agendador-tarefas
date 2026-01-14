@@ -47,13 +47,13 @@ public class TarefasController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping
+    @PutMapping
     public ResponseEntity<TarefasDTO> alteraStatusNotificacao(@RequestParam("status")StatusNotificacaoEnum status,
                                                               @RequestParam("id") String id){
         return ResponseEntity.ok(tarefasService.alteraStatus(status, id));
     }
 
-    @PutMapping
+    @PutMapping("/{id}/status")
     public ResponseEntity<TarefasDTO> updateTarefas(@RequestBody TarefasDTO dto,
                                                     @RequestParam("id")String id){
         return ResponseEntity.ok(tarefasService.updateTarefas(dto, id));
